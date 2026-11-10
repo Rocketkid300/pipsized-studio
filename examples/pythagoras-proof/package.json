@@ -1,0 +1,21 @@
+{
+  "name": "pythagoras-proof",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "studio": "npx remotion studio",
+    "render": "npx remotion render src/index.ts PythagorasProof out/pythagoras-proof.mp4 --codec h264 --muted"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.539",
+    "katex": "^0.16.11",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "remotion": "4.0.539"
+  },
+  "devDependencies": {
+    "@types/katex": "^0.16.7",
+    "@types/react": "^18.2.0",
+    "typescript": "^5.0.0"
+  }
+}

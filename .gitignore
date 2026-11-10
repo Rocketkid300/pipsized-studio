@@ -1,0 +1,9 @@
+node_modules/
+build/
+.env
+dashboard/jobs/
+shorts/
+batch/*/
+batch/finished/
+out/stills/
+*.mp4

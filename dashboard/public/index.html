@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Pipsized Studio</title>
+<style>
+  :root {
+    --bg: #f6f5f2; --panel: #ffffff; --ink: #1d1c1a; --dim: #6d6a64; --line: #e3e0da;
+    --accent: #c2410c; --accent-ink: #ffffff; --ok: #15803d; --bad: #b91c1c; --run: #1d4ed8; --code: #f1efea;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #141413; --panel: #1d1d1b; --ink: #ecebe7; --dim: #9a978f; --line: #2e2d2a;
+      --accent: #f97316; --accent-ink: #1a1007; --ok: #4ade80; --bad: #f87171; --run: #60a5fa; --code: #191917;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  header { padding: 22px 24px 8px; max-width: 1240px; margin: 0 auto; }
+  h1 { margin: 0; font-size: 22px; letter-spacing: -0.01em; }
+  header p { margin: 4px 0 0; color: var(--dim); }
+  main { max-width: 1240px; margin: 0 auto; padding: 12px 24px 40px; display: grid; grid-template-columns: 340px 1fr; gap: 20px; }
+  @media (max-width: 860px) { main { grid-template-columns: 1fr; padding: 12px 16px 32px; } header { padding: 18px 16px 4px; } }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+  label { display: block; font-size: 13px; color: var(--dim); margin: 0 0 6px; }
+  textarea, select { width: 100%; font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px; }
+  textarea { min-height: 96px; resize: vertical; }
+  button { font: inherit; border: 0; border-radius: 8px; padding: 10px 14px; cursor: pointer; }
+  .primary { background: var(--accent); color: var(--accent-ink); font-weight: 600; width: 100%; margin-top: 12px; }
+  .primary:disabled { opacity: 0.5; cursor: default; }
+  .ghost { background: transparent; color: var(--dim); border: 1px solid var(--line); padding: 6px 10px; font-size: 13px; }
+  .field + .field { margin-top: 12px; }
+  .hint { font-size: 12px; color: var(--dim); margin-top: 8px; }
+  .err { color: var(--bad); font-size: 13px; margin-top: 8px; min-height: 1em; }
+  h2 { font-size: 14px; margin: 20px 0 8px; color: var(--dim); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+  .jobs { display: flex; flex-direction: column; gap: 8px; }
+  .job { text-align: left; width: 100%; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; color: var(--ink); }
+  .job.sel { border-color: var(--accent); }
+  .job .idea { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .job .meta { font-size: 12px; color: var(--dim); }
+  .pill { display: inline-block; font-size: 12px; padding: 1px 8px; border-radius: 99px; border: 1px solid currentColor; }
+  .s-queued { color: var(--dim); } .s-running { color: var(--run); } .s-done { color: var(--ok); } .s-failed, .s-stopped { color: var(--bad); }
+  .detail-head { display: flex; gap: 12px; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; }
+  .detail-head h3 { margin: 0; font-size: 18px; }
+  video, .board { width: 100%; border-radius: 10px; background: #000; display: block; margin-top: 14px; }
+  .notes { margin-top: 10px; color: var(--dim); }
+  .log { margin-top: 14px; background: var(--code); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; max-height: 420px; overflow: auto; font: 12.5px/1.45 ui-monospace, "SF Mono", Menlo, monospace; }
+  .log div { padding: 2px 0; white-space: pre-wrap; word-break: break-word; }
+  .log .tool { color: var(--dim); } .log .error { color: var(--bad); } .log .done { color: var(--ok); } .log .info { color: var(--run); }
+  .empty { color: var(--dim); text-align: center; padding: 48px 12px; }
+  .elapsed { font-size: 13px; color: var(--dim); }
+  header { position: relative; }
+  .batch { position: absolute; right: 24px; top: 24px; background: var(--panel); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; font-size: 14px; text-decoration: none; }
+  .batch:hover { border-color: var(--accent); }
+  @media (max-width: 860px) { .batch { position: static; display: inline-block; margin-top: 10px; } }
+  .check { display: flex; gap: 8px; align-items: center; margin: 12px 0 0; color: var(--ink); font-size: 14px; }
+  .check input { width: auto; }
+  .ready { margin-top: 14px; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--ok); color: var(--ink); }
+</style>
+</head>
+<body>
+<header>
+  <h1>Pipsized Studio</h1>
+  <p>Type an idea, pick a format, and Claude makes the whole Short on this computer.</p>
+  <a class="batch" id="batch" href="/api/batch.zip">Download batch</a>
+</header>
+<main>
+  <section>
+    <form class="card" id="form">
+      <div class="field">
+        <label for="idea">Idea</label>
+        <textarea id="idea" placeholder="What if you could breathe underwater?" required></textarea>
+      </div>
+      <div class="field">
+        <label for="format">Format</label>
+        <select id="format"></select>
+      </div>
+      <label class="check"><input type="checkbox" id="render" /> Render the video too (fast PC with a graphics card)</label>
+      <button class="primary" id="go" type="submit">Make video</button>
+      <div class="err" id="err"></div>
+      <div class="hint">Jobs run one at a time. A Scale Short takes about 15–40 minutes of Claude work and ~500 ElevenLabs credits for the voice. Without "Render", it lands in the batch for RENDER-ALL.</div>
+    </form>
+    <h2>Videos</h2>
+    <div class="jobs" id="jobs"></div>
+  </section>
+  <section class="card" id="detail"><div class="empty">Pick a video on the left, or make a new one.</div></section>
+</main>
+<script>
+  const $ = (s) => document.querySelector(s);
+  let jobs = [], sel = null, es = null, formats = {};
+  try { sel = localStorage.getItem('sel'); } catch {}
+
+  const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const ago = (ms) => { const m = Math.round(ms / 60000); return m < 1 ? 'just now' : m < 60 ? `${m} min` : `${Math.floor(m / 60)} h ${m % 60} min`; };
+  const statusText = { queued: 'Queued', running: 'Making…', done: 'Done', failed: 'Failed', stopped: 'Stopped' };
+
+  fetch('/api/formats').then((r) => r.json()).then((list) => {
+    $('#format').innerHTML = list.map((f) => `<option value="${f.id}">${esc(f.label)}</option>`).join('');
+    list.forEach((f) => (formats[f.id] = f.label));
+    renderList();
+  });
+
+  function renderList() {
+    $('#jobs').innerHTML = jobs.length ? jobs.map((j) => `
+      <button class="job ${j.id === sel ? 'sel' : ''}" data-id="${j.id}">
+        <span class="idea">${esc(j.idea)}</span>
+        <span class="meta"><span class="pill s-${j.status}">${statusText[j.status]}</span> · ${esc((formats[j.format] || j.format).split(' (')[0])} · ${ago(Date.now() - j.created)} ago</span>
+      </button>`).join('') : '<div class="hint">No videos yet.</div>';
+    document.querySelectorAll('.job').forEach((b) => (b.onclick = () => select(b.dataset.id)));
+  }
+
+  function renderDetail() {
+    const j = jobs.find((x) => x.id === sel);
+    if (!j) { $('#detail').innerHTML = '<div class="empty">Pick a video on the left, or make a new one.</div>'; return; }
+    const r = j.result || {};
+    const time = j.started ? `${ago((j.finished || Date.now()) - j.started)}${j.finished ? '' : ' so far'}` : '';
+    const keepLog = $('#log') ? $('#log').innerHTML : '';
+    $('#detail').innerHTML = `
+      <div class="detail-head">
+        <div>
+          <h3>${esc(r.title || j.idea)}</h3>
+          <div class="elapsed"><span class="pill s-${j.status}">${statusText[j.status]}</span> ${esc(formats[j.format] || j.format)}${time ? ' · ' + time : ''}${r.credits ? ' · ' + r.credits + ' ElevenLabs credits' : ''}</div>
+        </div>
+        ${j.status === 'running' || j.status === 'queued' ? '<button class="ghost" id="stop">Stop</button>' : ''}
+      </div>
+      ${j.status === 'done' ? `${r.video ? `<video controls src="/api/jobs/${j.id}/video"></video>` : `<div class="ready">Ready in the batch. Use <b>Download batch</b> and send it to the fast PC; RENDER-ALL.bat makes the video with sound.</div>`}${r.notes ? `<p class="notes">${esc(r.notes)}</p>` : ''}${r.storyboard ? `<img class="board" alt="Storyboard" src="/api/jobs/${j.id}/storyboard">` : ''}` : ''}
+      ${j.error ? `<p class="err">${esc(j.error)}</p>` : ''}
+      <div class="log" id="log">${keepLog}</div>`;
+    const stop = $('#stop');
+    if (stop) stop.onclick = () => fetch(`/api/jobs/${j.id}/stop`, { method: 'POST' });
+  }
+
+  function select(id) {
+    if (sel !== id || !es) {
+      sel = id;
+      try { localStorage.setItem('sel', id); } catch {}
+      if (es) es.close();
+      renderList();
+      $('#detail').innerHTML = '';
+      renderDetail();
+      $('#log').innerHTML = '';
+      es = new EventSource(`/api/jobs/${id}/events`);
+      es.onmessage = (m) => {
+        const ev = JSON.parse(m.data), log = $('#log');
+        if (!log) return;
+        const stick = log.scrollTop + log.clientHeight >= log.scrollHeight - 30;
+        const d = document.createElement('div');
+        d.className = ev.kind;
+        const t = new Date(ev.at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        d.textContent = `${t}  ${ev.kind === 'tool' ? '› ' : ''}${ev.text}${ev.cost ? `  ($${ev.cost.toFixed(2)} of Claude usage, ${ev.turns} turns)` : ''}`;
+        log.appendChild(d);
+        if (stick) log.scrollTop = log.scrollHeight;
+      };
+    }
+  }
+
+  const refreshBatch = () =>
+    fetch('/api/batch').then((r) => r.json()).then((b) => ($('#batch').textContent = `Download batch (${b.count} Short${b.count === 1 ? '' : 's'})`)).catch(() => {});
+  refreshBatch();
+
+  new EventSource('/api/jobs/stream').onmessage = (m) => {
+    refreshBatch();
+    const prev = jobs.find((x) => x.id === sel);
+    jobs = JSON.parse(m.data);
+    renderList();
+    const now = jobs.find((x) => x.id === sel);
+    if (sel && now && !es) select(sel);
+    else if (now && (!prev || prev.status !== now.status)) renderDetail();
+  };
+  setInterval(() => { renderList(); const j = jobs.find((x) => x.id === sel); if (j && j.status === 'running') { const e = document.querySelector('.elapsed'); if (e) renderDetail(); } }, 60000);
+
+  $('#form').onsubmit = async (e) => {
+    e.preventDefault();
+    $('#err').textContent = '';
+    $('#go').disabled = true;
+    const res = await fetch('/api/jobs', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ idea: $('#idea').value, format: $('#format').value, render: $('#render').checked }) });
+    const body = await res.json();
+    $('#go').disabled = false;
+    if (!res.ok) { $('#err').textContent = body.error; return; }
+    $('#idea').value = '';
+    es && es.close(); es = null;
+    select(body.id);
+  };
+</script>
+</body>
+</html>

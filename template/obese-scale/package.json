@@ -1,0 +1,24 @@
+{
+  "name": "obese-scale",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "studio": "npx remotion studio",
+    "render": "npx remotion render src/index.ts Short out/short.mp4 --codec h264"
+  },
+  "dependencies": {
+    "@react-three/fiber": "8.17.10",
+    "@remotion/cli": "4.0.539",
+    "@remotion/google-fonts": "4.0.539",
+    "@remotion/three": "4.0.539",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "remotion": "4.0.539",
+    "three": "0.169.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "@types/three": "0.169.0",
+    "typescript": "^5.0.0"
+  }
+}
