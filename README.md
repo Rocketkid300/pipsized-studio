@@ -27,7 +27,8 @@ fast PC double-click **RENDER-ALL.bat**; the videos, with sound, appear in `batc
 | `batch/` | `RENDER-ALL.bat` / `render-all.sh`: render every waiting Short in one go |
 | `tools/elevenlabs.py` | the tiny ElevenLabs client the scripts share (reads the key from `.env`) |
 | `brand/` | Pip's profile picture (800 and 1080 px) |
-| `examples/` | earlier experiments: the "Day N" 3D Short and a silent maths proof |
+| `examples/8-billion-shoulder-to-shoulder/` | the first Short the dashboard made on its own, from one line: *"What if all 8 billion people stood shoulder to shoulder?"* |
+| `examples/everyone-obese-dayN/`, `examples/pythagoras-proof/` | earlier experiments: the "Day N" 3D Short and a silent maths proof |
 | `docs/` | [SETUP](docs/SETUP.md) · [FORMAT](docs/FORMAT.md) (the Pipsized recipe) · [PROCESS](docs/PROCESS.md) (how this was built) |
 
 ## Costs

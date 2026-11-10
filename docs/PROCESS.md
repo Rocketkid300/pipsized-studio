@@ -24,7 +24,12 @@ A log of one long Claude Code session (10–11 Nov 2026), from "what's this tool
    on every switch, and make captions bold and word-by-word. All of that is now the template and `docs/FORMAT.md`.
 8. **Split work across two PCs.** The slow PC (and Claude) makes the projects; the fast PC renders them all with
    one double-click (`batch/RENDER-ALL.bat`). The dashboard's **Download batch** button zips everything waiting.
-9. **Brand.** Channel name *Pipsized* (bite-sized, with Pip), and a cute avatar rendered from the same 3D kit
+9. **The first hands-off Short.** One line typed into the dashboard (*"What if all 8 billion people on Earth stood
+   shoulder to shoulder in one place?"*) produced a complete project with no help: a hook (*"Everyone you've ever met
+   is standing on your foot."*), sourced numbers (2,000 km², smaller than Tokyo; 70 Great Pyramids of weight; an
+   hour-long Mexican wave) and a punchline (*"Everyone left the oven on."*), for 593 ElevenLabs credits.
+   It's in `examples/8-billion-shoulder-to-shoulder`.
+10. **Brand.** Channel name *Pipsized* (bite-sized, with Pip), and a cute avatar rendered from the same 3D kit
    (`src/Avatar.tsx` → `brand/`).
 
 ## What we'd do next
